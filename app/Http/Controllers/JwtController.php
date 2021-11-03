@@ -15,7 +15,7 @@ class JwtController extends Controller
         $this->jwtService = $service;
     }
 
-    public function generate(): string
+    public function generate()
     {
         return $this->jwtService->generateToken();
     }
