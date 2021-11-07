@@ -19,8 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('generate-jwt', [JwtController::class,'generate']);
+Route::get('generate-jwt', [JwtController::class,'generate'])->middleware('jwt');;
 
-Route::middleware('auth:api')->get('/service', function(Request $request) {
-    return 'asd';
-});

@@ -4,12 +4,13 @@ namespace App\Http\Services;
 
 use App\Http\Services\Contracts\JwtInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class JwtService implements JwtInterface
 {
     private const JWT_HEADER = ['typ' => 'JWT', 'alg' => 'HS256'];
 
-    const EXPIRES_IN = 10;
+    const EXPIRES_IN_SECONDS = 60;
 
     public function generateToken(): string
     {
@@ -18,7 +19,7 @@ class JwtService implements JwtInterface
 
         // Encode Payload to Base64Url String
         $base64UrlPayload = $this->encodeBase64(json_encode([
-            'exp' => self::EXPIRES_IN,
+            'exp' => self::EXPIRES_IN_SECONDS,
             'created' => Carbon::now()
         ]));
 
@@ -27,6 +28,7 @@ class JwtService implements JwtInterface
 
         // Create JWT
         $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        session()->put('LAST_TOKEN_ACTIVITY', time());
 
         return $jwt;
     }

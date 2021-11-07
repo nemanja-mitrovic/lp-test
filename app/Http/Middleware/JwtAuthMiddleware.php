@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Services\JwtService;
 use Closure;
+use Illuminate\Support\Facades\Session;
 
 class JwtAuthMiddleware
 {
@@ -14,7 +16,18 @@ class JwtAuthMiddleware
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {   return response('Unauthorised', 401);
-        return $next($request);
+    {
+        $loginTime = session()->get('LAST_TOKEN_ACTIVITY');
+        if ($loginTime !== null) {
+            $loginTimeDifference = time() - $loginTime;
+            if ($loginTimeDifference > JwtService::EXPIRES_IN_SECONDS) {
+                session()->flush();
+                return $next($request);
+            } else {
+                return response('Token still active', 401);
+            }
+        } else {
+            return $next($request);
+        }
     }
 }
